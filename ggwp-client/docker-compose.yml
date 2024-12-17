@@ -1,0 +1,15 @@
+services:
+  ggwp-client:
+    build: .
+    container_name: ggwp-client
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./.env:/ggwp/.env
+    extra_hosts:
+      - "foobar.ggwp.local:127.0.0.1"
+      - "host.docker.internal:host-gateway"

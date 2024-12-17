@@ -1,0 +1,28 @@
+events {}
+
+http {
+    access_log /dev/stdout;
+    error_log /dev/stderr;
+
+    map $host $backend {
+        default "invalid";
+        include /etc/nginx/conf.d/tunnel_map.conf;
+    }
+
+    server {
+
+        listen 80;
+        server_name ~^(?<subdomain>.+)\.${DOMAIN}$;
+
+        if ($backend = "invalid") {
+            return 404 "Error: User does not exist or is not connected.";
+        }
+
+        location / {
+            proxy_pass http://$backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+}
